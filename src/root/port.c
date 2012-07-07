@@ -729,7 +729,7 @@ longdouble Port::sqrt(longdouble x)
 
 longdouble Port::fmodl(longdouble x, longdouble y)
 {
-#if __FreeBSD__ && __FreeBSD_version < 800000 || __OpenBSD__
+#if __FreeBSD__ && __FreeBSD_version < 800000 || __OpenBSD__ || __arm__
     return ::fmod(x, y);        // hack for now, fix later
 #else
     return ::fmodl(x, y);

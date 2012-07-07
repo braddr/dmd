@@ -241,6 +241,7 @@ dt_t ** dtcat(dt_t **pdtend,dt_t *dt)
  * Construct a DTcoff record, and return it.
  */
 
+#if !(TARGET_LINUX || TARGET_OSX || TARGET_FREEBSD || TARGET_OPENBSD || TARGET_SOLARIS)
 dt_t ** dtcoff(dt_t **pdtend,unsigned offset)
 {   dt_t *dt;
 
@@ -257,6 +258,7 @@ dt_t ** dtcoff(dt_t **pdtend,unsigned offset)
     pdtend = &dt->DTnext;
     return pdtend;
 }
+#endif
 
 /**********************
  * Construct a DTxoff record, and return it.

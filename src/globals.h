@@ -128,6 +128,7 @@ struct Param
     bool debugc;
     bool debugf;
     bool debugr;
+    bool debugw;
     bool debugx;
     bool debugy;
 

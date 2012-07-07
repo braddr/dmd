@@ -969,7 +969,11 @@ public:
 
         incUsage(irs, s->loc);
         elem *e = toElemDtor(s->exp, irs);
+#if TX86
         e = el_bin(OPcall, TYvoid, el_var(rtlsym[RTLSYM_THROWC]),e);
+#else
+        assert(0);
+#endif
         block_appendexp(blx->curblock, e);
     }
 

@@ -32,11 +32,25 @@ static char __file__[] = __FILE__;      /* for tassert.h                */
  */
 inline void ccheck(code *cs)
 {
+//    if (cs->Iop == OP_MOV && cs->getRegD() == SP && cs->getRegM() == R0) *(char*)0=0;
 //    if (cs->Iop == LEA && (cs->Irm & 0x3F) == 0x34 && cs->Isib == 7) *(char*)0=0;
 //    if (cs->Iop == 0x31) *(char*)0=0;
 //    if (cs->Irm == 0x3D) *(char*)0=0;
 //    if (cs->Iop == LEA && cs->Irm == 0xCB) *(char*)0=0;
 }
+
+#if DEBUG
+
+void code_print(code *c)
+{
+    while (c)
+    {
+        c->print();
+        c = c->next;
+    }
+}
+
+#endif
 
 /*****************************
  * Find last code in list.
@@ -77,7 +91,6 @@ void code_orrex(code *c,unsigned rex)
         c->Irex |= rex;
     }
 }
-#endif
 
 /**************************************
  * Set the opcode fields in cs.
@@ -87,6 +100,7 @@ code *setOpcode(code *c, code *cs, unsigned op)
     cs->Iop = op;
     return c;
 }
+#endif
 
 /*****************************
  * Concatenate two code lists together. Return pointer to result.
@@ -175,7 +189,15 @@ code *gen(code *c,code *cs)
 #endif
     code* ce = code_calloc();
     *ce = *cs;
-    //printf("ce = %p %02x\n", ce, ce->Iop);
+#if TX86
+    //printf("ce = %p %02x, Irm = %02x\n", ce, ce->Iop, ce->Irm);
+#elif DM_TARGET_CPU_ARM
+    //printf("ce = %p %02x, isStack = %d, src = %02x, dst = %02x\n", ce, ce->Iop, ce->isStackSlot(), ce->getSrcReg(), ce->getDstReg());
+#elif DM_TARGET_CPU_stub
+    // nothing to print
+#else
+#error unknown cpu
+#endif
     ccheck(ce);
     simplify_code(ce);
     code_next(ce) = CNIL;
@@ -380,12 +402,12 @@ code *genadjesp(code *c, int offset)
  * Generate 'instruction' which tells the scheduler that the fpu stack has
  * changed.
  */
-
+// ARM TODO: move to x86 specific file?
 code *genadjfpu(code *c, int offset)
-{   code cs;
-
+{
     if (!I16 && offset)
     {
+        code cs;
         cs.Iop = ESCAPE | ESCadjfpu;
         cs.IEV1.Vint = offset;
         return gen(c,&cs);

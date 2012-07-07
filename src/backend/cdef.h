@@ -346,8 +346,20 @@ typedef long double longdouble;
 #endif
 #define ARG_TRUE
 #define ARG_FALSE
+
+#if TX86
 #define T68000(x)
-#define T80x86(x)       x
+#define T80x86(x) x
+#define TARM(x)
+#elif DM_TARGET_CPU_ARM
+#define T80x86(x)
+#define TARM(x) x
+#elif DM_TARGET_CPU_stub
+#define T80x86(x)
+#define TARM(x)
+#else
+#error unknown cpu
+#endif
 
 // For Share MEM_ macros - default to mem_xxx package
 // PH           precompiled header

@@ -355,10 +355,13 @@ void outdata(symbol *s)
     {
         switch (dt->dt)
         {   case DT_abytes:
-                if (tyreg(dt->Dty))
-                    flags = CFoff;
-                else
-                    flags = CFoff | CFseg;
+                flags = CFoff;
+                if (!tyreg(dt->Dty))
+#if TX86
+                    flags |= CFseg;
+#else
+                    assert(0);
+#endif
                 if (I64)
                     flags |= CFoffset64;
 #if TARGET_SEGMENTED
@@ -406,10 +409,13 @@ void outdata(symbol *s)
             {
                 symbol *sb = dt->DTsym;          // get external symbol pointer
                 a = dt->DToffset; // offset from it
-                if (tyreg(dt->Dty))
-                    flags = CFoff;
-                else
-                    flags = CFoff | CFseg;
+                flags = CFoff;
+                if (!tyreg(dt->Dty))
+#if TX86
+                    flags |= CFseg;
+#else
+                    assert(0);
+#endif
                 if (I64 && tysize(dt->Dty) == 8)
                     flags |= CFoffset64;
                 offset += objmod->reftoident(seg,offset,sb,a,flags);

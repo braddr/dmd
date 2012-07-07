@@ -39,6 +39,11 @@
 #include "hdrgen.h"
 #include "doc.h"
 
+// TODO: looks like cdef.h isn't included, so TX86 isn't available.  Fix that.
+#if DM_TARGET_CPU_X86
+#define TX86 1
+#endif
+
 bool response_expand(size_t *pargc, const char ***pargv);
 
 
@@ -318,7 +323,14 @@ int tryMain(size_t argc, const char *argv[])
     global.params.ddocfiles = new Strings();
 
     // Default to -m32 for 32 bit dmd, -m64 for 64 bit dmd
+#if TX86
     global.params.is64bit = (sizeof(size_t) == 8);
+#elif DM_TARGET_CPU_ARM
+    global.params.is64bit = false;
+#else
+    assert(0);
+#endif
+
 
 #if TARGET_WINDOS
     global.params.mscoff = false;
@@ -515,8 +527,14 @@ int tryMain(size_t argc, const char *argv[])
             }
             else if (strcmp(p + 1, "m64") == 0)
             {
+#if TX86
                 global.params.is64bit = true;
                 global.params.mscoff = true;
+#elif DM_TARGET_CPU_ARM
+                error(Loc(), "-m64 not supported for arm");
+#else
+                assert(false);
+#endif
             }
             else if (strcmp(p + 1, "m32mscoff") == 0)
             {
@@ -899,6 +917,8 @@ Language changes listed by -transition=id:\n\
             {   logo();
                 exit(EXIT_SUCCESS);
             }
+            else if (strcmp(p + 1, "-w") == 0)
+                global.params.debugw = 1;
             else if (strcmp(p + 1, "-x") == 0)
                 global.params.debugx = true;
             else if (strcmp(p + 1, "-y") == 0)
@@ -1104,10 +1124,16 @@ Language changes listed by -transition=id:\n\
             //fatal();
         }
     }
+#if DM_TARGET_CPU_ARM
+    VersionCondition::addPredefinedGlobalIdent("ARM");
+    VersionCondition::addPredefinedGlobalIdent("ARMv4T");
+#endif
     if (global.params.is64bit)
     {
+#if TX86
         VersionCondition::addPredefinedGlobalIdent("D_InlineAsm_X86_64");
         VersionCondition::addPredefinedGlobalIdent("X86_64");
+#endif
         VersionCondition::addPredefinedGlobalIdent("D_SIMD");
 #if TARGET_WINDOS
         VersionCondition::addPredefinedGlobalIdent("Win64");
@@ -1121,8 +1147,10 @@ Language changes listed by -transition=id:\n\
     else
     {
         VersionCondition::addPredefinedGlobalIdent("D_InlineAsm"); //legacy
+#if TX86
         VersionCondition::addPredefinedGlobalIdent("D_InlineAsm_X86");
         VersionCondition::addPredefinedGlobalIdent("X86");
+#endif
 #if TARGET_OSX
         VersionCondition::addPredefinedGlobalIdent("D_SIMD");
 #endif

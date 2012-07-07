@@ -69,6 +69,8 @@ union evc
 #include "code_x86.h"
 #elif DM_TARGET_CPU_stub
 #include "code_stub.h"
+#elif DM_TARGET_CPU_ARM
+#include "code_arm.h"
 #else
 #error unknown cpu
 #endif
@@ -325,6 +327,7 @@ int cod3_EA(code *c);
 regm_t cod3_useBP();
 void cod3_initregs();
 void cod3_setdefault();
+void cod3_set16 (void );
 void cod3_set32 (void );
 void cod3_set64 (void );
 void cod3_align_bytes (size_t nbytes);
@@ -371,7 +374,7 @@ void jmpaddr (code *c );
 int code_match(code *c1,code *c2);
 unsigned calcblksize (code *c);
 unsigned calccodsize(code *c);
-unsigned codout (code *c );
+unsigned codout (code *c);
 size_t addtofixlist (symbol *s , targ_size_t soffset , int seg , targ_size_t val , int flags );
 void searchfixlist (symbol *s );
 void outfixlist (void );
@@ -508,6 +511,7 @@ code *nteh_monitor_epilog(regm_t retregs);
 code *nteh_patchindex(code* c, int index);
 
 // cgen.c
+void code_print(code *c);
 code *code_last(code *c);
 void code_orflag(code *c,unsigned flag);
 void code_orrex(code *c,unsigned rex);
