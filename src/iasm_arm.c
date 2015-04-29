@@ -2284,11 +2284,11 @@ int asm_getnum()
     switch (tok_value)
     {
         case TOKint32v:
-            v = asmtok->int32value;
+            v = (d_int32)asmtok->int64value;
             break;
 
         case TOKuns32v:
-            v = asmtok->uns32value;
+            v = (d_uns32)asmtok->uns64value;
             break;
 
         case TOKidentifier:
