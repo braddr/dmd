@@ -945,10 +945,10 @@ void Lexer::scan(Token *t)
             case '#':
             {
                 p++;
-                Token n;
-                scan(&n);
-                if (n.value == TOKidentifier && n.ident == Id::line)
+                Token *n = peek(t);
+                if (n->value == TOKidentifier && n->ident == Id::line)
                 {
+                    t->next = n->next; // strip 'line' from the token sequence
                     poundLine();
                     continue;
                 }
@@ -2171,7 +2171,7 @@ void Lexer::poundLine()
 
             case '"':
                 if (filespec)
-                    goto Lerr;
+                    goto LExtraStringerr;
                 stringbuffer.reset();
                 p++;
                 while (1)
@@ -2217,7 +2217,12 @@ void Lexer::poundLine()
     }
 
 Lerr:
-    error(loc, "#line integer [\"filespec\"]\\n expected");
+    error(loc, "#line integer [\"filespec\"]\\n expected, not '%s'", tok.toChars());
+    return;
+
+LExtraStringerr:
+    error(loc, "#line integer [\"filespec\"]\\n expected, found extra start quote");
+    return;
 }
 
 
