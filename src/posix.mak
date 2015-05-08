@@ -37,8 +37,10 @@ ROOT=root
 
 OBJ_FORMAT=elf
 ifeq (osx,$(OS))
-    OBJ_FORMAT=mach
-    export MACOSX_DEPLOYMENT_TARGET=10.3
+    ifeq (X86,$(TARGET_CPU))
+        OBJ_FORMAT=mach
+        export MACOSX_DEPLOYMENT_TARGET=10.3
+    endif
 endif
 LDFLAGS=-lm -lstdc++ -lpthread
 

@@ -2368,7 +2368,7 @@ void ElfObj::addrel(int seg, targ_size_t offset, unsigned type,
  *              Obj::reftodatseg(DATA,offset,3 * sizeof(int *),UDATA);
  */
 
-void Obj::reftodatseg(int seg,targ_size_t offset,targ_size_t val,
+int Obj::reftodatseg(int seg,targ_size_t offset,targ_size_t val,
         unsigned targetdatum,int flags)
 {
     Outbuffer *buf = SegData[seg]->SDbuf;
@@ -2391,12 +2391,13 @@ void Obj::reftodatseg(int seg,targ_size_t offset,targ_size_t val,
             buf->write64(val);
             if (save > offset + 8)
                 buf->setsize(save);
-            return;
+            return 8;
         }
     }
     buf->write32(val);
     if (save > offset + 4)
         buf->setsize(save);
+    return 4;
 }
 
 /*******************************
@@ -2409,7 +2410,7 @@ void Obj::reftodatseg(int seg,targ_size_t offset,targ_size_t val,
  *      val =           displacement from start of this module
  */
 
-void Obj::reftocodeseg(int seg,targ_size_t offset,targ_size_t val)
+int Obj::reftocodeseg(int seg,targ_size_t offset,targ_size_t val)
 {
     //printf("Obj::reftocodeseg(seg=%d, offset=x%lx, val=x%lx )\n",seg,(unsigned long)offset,(unsigned long)val);
     assert(seg > 0);
@@ -2424,6 +2425,7 @@ void Obj::reftocodeseg(int seg,targ_size_t offset,targ_size_t val)
         buf->write32(val);
     if (save > offset + 4)
         buf->setsize(save);
+    return 4;
 }
 
 /*******************************
